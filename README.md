@@ -1,0 +1,1 @@
+# azuredatafactory_loganalytics
