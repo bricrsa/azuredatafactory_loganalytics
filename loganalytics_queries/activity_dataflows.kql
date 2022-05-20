@@ -1,0 +1,11 @@
+let DataFlows = ADFActivityRun 
+| where Status has_any ('Succeeded','Failed')
+| where ActivityType == "ExecuteDataFlow"
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| extend input = parse_json(Input), output = parse_json(Output)
+| extend coreCount = toint(input.compute.coreCount), computeType = tostring(input.compute.computeType)
+| extend billing_data = parse_json(Output).billingReference
+| extend bd = parse_xml(billing_data)
+| extend activityType = bd.activityType
+| extend meterType = tostring(bd.billableDuration[0].meterType), duration = toreal(bd.billableDuration[0].duration), unit = tostring(bd.billableDuration[0].unit), sessionType = tostring(bd.billableDuration[0].sessionType)
+| project TimeGenerated, DataFactory, PipelineName, PipelineRunId, Status, computeType, coreCount, duration, CorrelationId, ActivityRunId, Start=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss');

@@ -1,0 +1,21 @@
+
+let PL_Layer1 = ADFPipelineRun 
+| where ResourceId contains "MAS-PRSN-CMN-ALL-XX-PROD" 
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| where Status == "Succeeded"
+| extend cpj = parse_json(Predecessors)
+| mv-expand cpj
+| extend CallingPipelineName = cpj.PipelineName, CallType = cpj.InvokedByType, CallingPipelineRunID = tostring(cpj.PipelineRunId);
+let PL_Layer2 = ADFPipelineRun 
+| where ResourceId contains "MAS-PRSN-CMN-ALL-XX-PROD" 
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| where Status == "Succeeded"
+| extend cpj = parse_json(Predecessors)
+| mv-expand cpj
+| extend CallingPipelineName = cpj.PipelineName, CallType = cpj.InvokedByType, CallingPipelineRunID = tostring(cpj.PipelineRunId);
+PL_Layer1
+| join kind = leftouter PL_Layer2 on $left.RunId == $right.CallingPipelineRunID
+| extend CalledPipeline = PipelineName1, CalledPipelineStart = Start1, CalledPipelineEnd = End1, CalledPipelineRunId = RunId1
+| project-keep DataFactory, PipelineName, Start, End, RunId, CalledPipeline, CalledPipelineStart, CalledPipelineEnd, CalledPipelineRunId
+| project-reorder DataFactory, PipelineName, Start, End, RunId, CalledPipeline, CalledPipelineStart, CalledPipelineEnd, CalledPipelineRunId
+| order by Start

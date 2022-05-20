@@ -1,0 +1,17 @@
+
+
+//list of all activity types
+ADFActivityRun 
+| where Status == "Succeeded"
+| summarize ActivityCount = count(TimeGenerated) by ActivityType
+
+
+//list of actities by Integration Runtime
+ADFActivityRun 
+| where Status has_any ('Succeeded','Failed')
+| extend billing_data = parse_json(Output).billingReference
+| extend bd = parse_xml(billing_data)
+| extend activityType = tostring(bd.activityType)
+| extend meterType = tostring(bd.billableDuration[0].meterType)
+| summarize by activityType,meterType
+
