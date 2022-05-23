@@ -16,6 +16,7 @@ Add [Diagnostic settings](/media/DiagnosticSettings.png)
 - [Known issues](#known-issues)
 
 
+
 ## Understanding the logs
 
 Ensure that the Resource specific log analytics integration is used.
@@ -75,3 +76,9 @@ Use the [Excel workbook](/media/ADF_Gantt.xlsx) to show a rudimentary Gantt char
 ## Known issues
 
 If there is too much information in certain activities (typically a dataflow), ADF will not pass only the logs appropriately. An error will appear in the Output section of the activity: {"errorMessage":"Value is too large to be parsed for logging"}
+
+## Understanding the size of your Logs in Log Analytics
+
+ADF generally does not generate a large volume of logs. Note that you should always use the Resource Specific option for Diagnostic settings if available.
+
+Example query for [exploring usage](./loganalytics_queries/usage_explore.kql)

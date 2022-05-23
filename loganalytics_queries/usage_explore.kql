@@ -1,0 +1,40 @@
+Usage 
+| summarize Total = sum(Quantity) by SourceSystem, DataType, Solution, QuantityUnit, IsBillable
+| order by Total
+
+//Big users
+Usage 
+| where TimeGenerated > ago(14d)
+//add in the very large users from the first query
+| where DataType has_any ('AzureDiagnostics', 'StorageBlobLogs')
+| summarize Total = sum(Quantity) by Date= bin(TimeGenerated,1d) , DataType, Solution, QuantityUnit, IsBillable
+| render timechart 
+
+//Smaller users
+Usage 
+| where TimeGenerated > ago(14d)
+//exclude the very large users from the first query
+| where DataType !in ("AzureDiagnostics", "StorageBlobLogs")
+| summarize Total = sum(Quantity) by Date= bin(TimeGenerated,1d) , DataType, Solution, QuantityUnit, IsBillable
+| render timechart 
+
+//Smaller users
+Usage 
+| where TimeGenerated > ago(14d)
+| where DataType !in ("AzureDiagnostics", "StorageBlobLogs")
+| summarize Total = sum(Quantity) by Date= bin(TimeGenerated,1d) , DataType, Solution, QuantityUnit, IsBillable
+
+//have a quick look at Diagnostics details
+Usage 
+| where TimeGenerated > ago(2h)
+| where DataType =='AzureDiagnostics'
+
+//understand the detail of where particular usage is coming from within the big bucket of Azure Diagnostics
+AzureDiagnostics 
+| summarize LogCount = count(TimeGenerated) by bin(TimeGenerated, 30m),  Category
+| render timechart 
+
+
+AzureDiagnostics 
+| summarize LogCount = count(TimeGenerated) by bin(TimeGenerated, 30m),  Resource, Category
+| render timechart 

@@ -15,7 +15,7 @@ let DataFlows = ADFActivityRun
 | extend bd = parse_xml(billing_data)
 | extend activityType = bd.activityType
 | extend meterType = tostring(bd.billableDuration[0].meterType), duration = toreal(bd.billableDuration[0].duration), unit = tostring(bd.billableDuration[0].unit), sessionType = tostring(bd.billableDuration[0].sessionType)
-| project TimeGenerated, DataFactory, PipelineName, PipelineRunId, Status, computeType, coreCount, duration, TimeDur = End-Start, unit, Start=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss');
+| project TimeGenerated, DataFactory, PipelineName, PipelineRunId, Status, computeType, coreCount, duration, TimeDur = End-Start, unit, Start, Starts=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss');
 let CopyActivity = ADFActivityRun 
 | where Status has_any ('Succeeded','Failed')
 | where ActivityType == "Copy"
@@ -24,14 +24,14 @@ let CopyActivity = ADFActivityRun
 | extend bd = parse_xml(billing_data)
 | extend activityType = bd.activityType, bdur = parse_xml(bd.billableDuration)
 | extend meterType = tostring(bd.billableDuration[0].meterType), duration = toreal(bd.billableDuration[0].duration), unit = tostring(bd.billableDuration[0].unit), sessionType = tostring(bd.billableDuration[0].sessionType)
-| project TimeGenerated, DataFactory, PipelineName, PipelineRunId, Status, computeType = meterType, coreCount = toint(1), duration, TimeDur = End-Start, unit, Start=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss');
+| project TimeGenerated, DataFactory, PipelineName, PipelineRunId, Status, computeType = meterType, coreCount = toint(1), duration, TimeDur = End-Start, unit,Start, Starts=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss');
 DataFlows | union CopyActivity
 | join kind= leftouter ADFCosts on computeType
 | extend runCost = cost*duration
 //summarize by factory, day, computeType
-//| summarize TotalRunCost = sum(runCost) ,TotalTimeDur = sum(TimeDur) by DataFactory, bin(Start, 1d), computeType, PipelineName, PipelineRunId
+| summarize TotalRunCost = sum(runCost) ,TotalTimeDur = sum(TimeDur) by DataFactory, bin(Start, 1d), computeType, PipelineName, PipelineRunId
 //summarize by day for checking ball park costs against cost analysis info
-| summarize TotalRunCost = sum(runCost) by Runday = bin(Start, 1d)
+//| summarize TotalRunCost = sum(runCost) by Runday = bin(Start, 1d)
 | render timechart 
 
 
