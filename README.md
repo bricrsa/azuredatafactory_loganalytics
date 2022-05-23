@@ -14,6 +14,7 @@ Add [Diagnostic settings](/media/DiagnosticSettings.png)
 - [Cost per Activity](#cost-per-activity)
 - [Gantt chart for Pipelines from Activity data](#gantt-chart-for-pipelines-from-activity-data)
 - [Known issues](#known-issues)
+- [Understanding the size of your Logs in Log Analytics](#understanding-the-size-of-your-logs-in-log-analytics)
 
 
 
@@ -36,7 +37,9 @@ This will show the following tables in Log Analytics. [Schemas](https://docs.mic
 *ADFPipelineRun*
  - contains tags, status, user properties, annotations and information about predecessors and triggers
  - includes parameters and system parameters
-Example query of Pipelines calling pipelines in [pipelines](/loganalytics_queries/pipeline_linking.kql)
+
+Example query of Pipelines calling pipelines in pipelines.
+- [Pipeline linkage](/loganalytics_queries/pipeline_linking.kql)
 
 ## Activity Runs
 
@@ -64,7 +67,8 @@ The detail of each series of stages is displayed in the dsl column under run_sta
  Coupling this with the specific cost for the region, integration runtime type and your billing arrangement, the actual cost per run can be calculated.
  [Understand general costs in ADF](https://azure.microsoft.com/en-gb/pricing/details/data-factory/data-pipeline/). Find your actual region based costs for your EA or other billing option by logging into the Pricing Calculator.
 
- An example query to calculate the cost for each [activity](/loganalytics_queries/activity_cost.kql). 
+ An example query to calculate the cost for each [activity]
+ - [Activity cost](/loganalytics_queries/activity_cost.kql). 
 
  Test the output of these queries against the actual costs you see in cost management to validate it is being calculated correctly.
 
