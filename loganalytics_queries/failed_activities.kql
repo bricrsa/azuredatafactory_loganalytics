@@ -1,0 +1,13 @@
+//failed
+let DataFlows = ADFActivityRun 
+| where Status == 'Failed'
+| where ActivityType == "ExecuteDataFlow"
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| extend Duration = End-Start ;
+let CopyActivity=  ADFActivityRun //detail query  - copy activity - rows etc focus
+| where Status == 'Failed'
+| where ActivityType == "Copy"
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| extend Duration = End-Start ;
+DataFlows
+| union CopyActivity

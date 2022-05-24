@@ -86,6 +86,7 @@
         "style": "tabs",
         "links": [
           {
+            "id": "3fe0b084-507b-450c-a8d8-e3db4aacdcf5",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Pipeline Runs",
@@ -93,6 +94,7 @@
             "style": "link"
           },
           {
+            "id": "6fbd5256-c47d-4957-9527-34bc38dce1d6",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Activity Runs",
@@ -100,6 +102,7 @@
             "style": "link"
           },
           {
+            "id": "d3091074-197d-42b8-b927-795746b4a525",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Trigger Runs",
@@ -107,6 +110,7 @@
             "style": "link"
           },
           {
+            "id": "6900af3e-7baf-4d8d-9bcb-0316dcc42e1b",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Error - Pipeline Runs",
@@ -114,6 +118,7 @@
             "style": "link"
           },
           {
+            "id": "7a13dfa0-6a9e-4c53-8302-f9e82061b4cc",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Error - Activity Runs",
@@ -121,6 +126,7 @@
             "style": "link"
           },
           {
+            "id": "a6e6a31f-0f7e-4a3a-b431-ac36dd18f5d8",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Error - Trigger Runs",
@@ -128,6 +134,7 @@
             "style": "link"
           },
           {
+            "id": "3aab8808-d2bf-4253-9506-feb4bdb5bd5b",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Stats - Runs by Type",
@@ -135,6 +142,7 @@
             "style": "link"
           },
           {
+            "id": "4ced1b7f-f107-402e-8768-283caa4b2d6a",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Stats - Trigggers by Type",
@@ -142,6 +150,7 @@
             "style": "link"
           },
           {
+            "id": "d30261bd-a7de-44f8-97d9-d9f2aa375f4f",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
             "linkLabel": "Stats - Max Pipeline Durations",
@@ -172,9 +181,6 @@
         "size": 0,
         "title": "Total Pipelines Running per Time slice",
         "color": "blueDark",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "showExportToExcel": true,
         "queryType": 0,
@@ -210,9 +216,6 @@
         "size": 2,
         "title": "Total Pipelines Completed per Time slice",
         "color": "blueDark",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "showExportToExcel": true,
         "queryType": 0,
@@ -342,9 +345,6 @@
         "size": 2,
         "title": "Total Activities Running per Time slice",
         "color": "grayBlue",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -365,9 +365,6 @@
         "size": 2,
         "title": "Total Activities Completed per Time slice",
         "color": "grayBlue",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -387,9 +384,6 @@
         "query": "let data = ADFActivityRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status != \"InProgress\";\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, Status, ActivityName\r\n| join kind = inner ( data \r\n| make-series Trend = count()  default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeRange:grain} by ResourceId, Status, ActivityName\r\n| project-away TimeGenerated) on ResourceId, Status, ActivityName\r\n| project ResourceId, Count, Trend, Status, ActivityName\r\n| order by Count desc;\r\n\r\n",
         "size": 0,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -475,9 +469,6 @@
         "query": "ADFTriggerRun\r\n| where Status != \"InProgress\" and Status != \"Waiting\"\r\n| extend Resource = tostring(split(ResourceId,\"/\",8))\r\n| summarize count() by Resource, bin(TimeGenerated,15m)\r\n\r\n",
         "size": 2,
         "color": "blueDark",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -497,9 +488,6 @@
         "query": "let data = ADFTriggerRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status != \"Running\" and Status !contains \"Waiting\";\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, Status, TriggerName\r\n| join kind = inner ( data \r\n| make-series Trend = count()  default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeRange:grain} by ResourceId, Status, TriggerName\r\n| project-away TimeGenerated) on ResourceId, Status, TriggerName\r\n| project ResourceId, Count, Trend, Status, TriggerName\r\n| order by Count desc;\r\n\r\n",
         "size": 0,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -579,9 +567,6 @@
         "query": "ADFPipelineRun\r\n| where Status == \"Failed\"\r\n| extend Resource = tostring(split(ResourceId,\"/\",8))\r\n| summarize ErrorCount = count() by Resource, bin(TimeGenerated,1h)\r\n| top 10 by ErrorCount\r\n",
         "size": 2,
         "color": "redBright",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -601,9 +586,6 @@
         "query": "let data = ADFPipelineRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Failed\";\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, FailureType, PipelineName\r\n| join kind = inner ( data \r\n| make-series Trend = count()  default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeRange:grain} by ResourceId, FailureType, PipelineName\r\n| project-away TimeGenerated) on ResourceId, FailureType, PipelineName\r\n| project ResourceId, Count, Trend, FailureType, PipelineName\r\n| order by Count desc;\r\n\r\n",
         "size": 0,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -653,9 +635,6 @@
         "version": "KqlItem/1.0",
         "query": "ADFActivityRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Failed\"\r\n| extend Resource = tostring(split(ResourceId,\"/\",8))\r\n| summarize ErrorCount = count() by Resource, bin(TimeGenerated,1h)\r\n| render timechart",
         "size": 1,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces"
@@ -675,9 +654,6 @@
         "size": 0,
         "showAnalytics": true,
         "title": "Failed Activities",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -727,9 +703,6 @@
         "version": "KqlItem/1.0",
         "query": "ADFTriggerRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Failed\"\r\n| summarize ErrorCount = count() by ResourceId, bin(TimeGenerated,1h)\r\n| render timechart",
         "size": 1,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces"
@@ -748,9 +721,6 @@
         "query": "let data = ADFTriggerRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Failed\";\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, TriggerName\r\n| join kind = inner ( data \r\n| make-series Trend = count()  default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeRange:grain} by ResourceId, TriggerName\r\n| project-away TimeGenerated) on ResourceId, TriggerName\r\n| project ResourceId, Count, Trend, TriggerName\r\n| order by Count desc;\r\n\r\n",
         "size": 1,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -801,9 +771,6 @@
         "query": "ADFActivityRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Succeeded\" or Status ==  \"Failed\"\r\n| summarize ActivityCount = count() by ActivityType, bin(TimeGenerated,1h)\r\n| render timechart",
         "size": 1,
         "title": "Activity Runs - Big Counts",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -823,9 +790,6 @@
         "query": "let data = ADFActivityRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status == \"Succeeded\" or Status ==  \"Failed\";\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, ActivityType\r\n| project ResourceId, ActivityType, Count\r\n| order by Count desc;\r\n\r\n",
         "size": 0,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -875,9 +839,6 @@
         "version": "KqlItem/1.0",
         "query": "ADFTriggerRun\r\n| where TimeGenerated {TimeRange}\r\n| where Status != \"InProgress\" and Status !contains \"Waiting\"\r\n| summarize Count = count() by TriggerType, bin(TimeGenerated, 1h)\r\n| render timechart",
         "size": 2,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces"
@@ -896,9 +857,6 @@
         "query": "let data = ADFTriggerRun\r\n| where TimeGenerated {TimeRange};\r\n\r\ndata\r\n| summarize Count = count() by ResourceId, TriggerType, Status\r\n| project ResourceId, TriggerType, Status, Count\r\n| order by Count desc;\r\n\r\n",
         "size": 0,
         "showAnalytics": true,
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -984,9 +942,6 @@
         "size": 0,
         "title": "Pipeline: Max Duration Minutes",
         "color": "blue",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1011,9 +966,6 @@
         "size": 0,
         "title": "Pipeline: Execution Count",
         "color": "blue",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1038,9 +990,6 @@
         "size": 0,
         "showAnalytics": true,
         "title": "Pipelines Max Durations",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1074,9 +1023,6 @@
         "size": 0,
         "showAnalytics": true,
         "title": "Pipeline Counts with Duration",
-        "timeContext": {
-          "durationMs": 259200000
-        },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1104,7 +1050,7 @@
     }
   ],
   "fallbackResourceIds": [
-    "/subscriptions/99626c5d-0085-4b5c-88c1-cb34b47453cc/resourcegroups/dta-eun-prod-rg-loganalytics-01/providers/microsoft.operationalinsights/workspaces/dta-eun-prod-loganalytics-01"
+    "/subscriptions/0655238a-76cd-4f92-bfe7-ca1a600a8f87/resourceGroups/MonitoringRG/providers/Microsoft.OperationalInsights/workspaces/PrimaryOMS"
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
