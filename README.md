@@ -86,3 +86,5 @@ If there is too much information in certain activities (typically a dataflow), A
 ADF generally does not generate a large volume of logs. Note that you should always use the Resource Specific option for Diagnostic settings if available.
 
 Example query for [exploring usage](./loganalytics_queries/usage_explore.kql)
+
+> Note: that are also a number of public Workbooks available under Log Analytics Workspace Insights, under the Workbooks blade for the Log Analytics workspace in the Azure Portal.

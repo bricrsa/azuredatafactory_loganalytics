@@ -24,3 +24,32 @@ let CopyActivityBytes=  ADFActivityRun //detail query  - copy activity - rows et
 | summarize MB_Read = sum(bytesRead)/(1024*1024), MB_Written = sum(bytesWritten)/(1024*1024) by DataFactory, PipelineName, CorrelationId, ActivityType,Status, Start=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss'), Duration = End-Start;
 DataFlowBytes
 | union CopyActivityBytes
+
+
+
+//summary of GB processed per day
+let DataFlowBytes = ADFActivityRun 
+| where Status has_any ('Succeeded','Failed')
+| where ActivityType == "ExecuteDataFlow"
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| extend run_status = parse_json(Output).runStatus
+| extend metrics = run_status.metrics
+| mv-expand metrics //note that this will give you multiple rows
+| extend str_metrics = tostring(metrics)
+| extend stage_num =  extract('"stage":([0-9]+)', 1, str_metrics)
+| extend recordsRead =  toint(extract('"recordsRead":([0-9]+)', 1, str_metrics))
+| extend recordsWritten =  toint(extract('"recordsWritten":([0-9]+)', 1, str_metrics))
+| extend bytesWritten =  toreal(extract('"bytesWritten":([0-9]+)', 1, str_metrics))
+| extend bytesRead =  toreal(extract('"bytesRead":([0-9]+)', 1, str_metrics))
+| summarize MB_Read = sum(bytesRead)/(1024*1024), MB_Written = sum(bytesWritten)/(1024*1024) by DataFactory, PipelineName, CorrelationId, ActivityType,Status, Start, Starts=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss'), Duration = End-Start ;
+let CopyActivityBytes=  ADFActivityRun //detail query  - copy activity - rows etc focus
+| where Status has_any ('Succeeded','Failed')
+| where ActivityType == "Copy"
+| extend DataFactory = substring(reverse(split(reverse(ResourceId),"/",0)),2,strlen(split(reverse(ResourceId),"/",0))-4)
+| extend amd = parse_json(Output)
+| extend bytesRead = toreal(amd.dataRead), bytesWritten = toreal(amd.dataWritten), meterType = amd.billingReference.billableDuration[0].meterType,  billableDuration = amd.billingReference.billableDuration[0].duration,  unit = amd.billingReference.billableDuration[0].unit
+| summarize MB_Read = sum(bytesRead)/(1024*1024), MB_Written = sum(bytesWritten)/(1024*1024) by DataFactory, PipelineName, CorrelationId, ActivityType,Status, Start, Starts=format_datetime(Start,'dd-MM-yyyy HH:mm:ss'), End=format_datetime(End,'dd-MM-yyyy HH:mm:ss'), Duration = End-Start;
+DataFlowBytes
+| union CopyActivityBytes
+| summarize Sum_GB_Read = sum(MB_Read)/1000,Sum_GB_Write = sum(MB_Written)/1000 by ActivityType, Date= bin(Start,1d)
+| render columnchart  
