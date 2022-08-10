@@ -1,1 +1,1 @@
-#include /contents.md
+[Contents](/contents.md)
