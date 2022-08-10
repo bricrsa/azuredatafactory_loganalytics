@@ -1,1 +1,1 @@
-#include "contents.md"
+#include /contents.md
