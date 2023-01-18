@@ -1,0 +1,24 @@
+ADF_Activity
+
+//list of all activity types
+ADFActivityRun 
+| where Status == "Succeeded"
+| summarize ActivityCount = count(TimeGenerated) by ActivityType
+
+//list of all activity types
+let ADF_Activity= ADFActivityRun 
+| where Status == "Succeeded"
+| where ActivityType  =="DatabricksNotebook"
+| extend RunPageURL = parse_json(Output).runPageUrl
+| extend ExecutionDuration = parse_json(Output).executionDuration
+| extend RunID = substring(reverse(split(reverse(RunPageURL),"/",0)),2,strlen(split(reverse(RunPageURL),"/",0))-4)
+| extend NotebookPath = parse_json(Input).notebookPath
+| extend InputParam_chosen =coalesce(extractjson("$.['tables']", tostring(parse_json(Input).baseParameters)) //mine for various parama, custom to implementation
+    , extractjson("$.['table_name']", tostring(parse_json(Input).baseParameters))
+    , extractjson("$.['job_name']", tostring(parse_json(Input).baseParameters)) 
+    , extractjson("$.['table']", tostring(parse_json(Input).baseParameters)) 
+    )
+| project PipelineName, ActivityName, InputParam_chosen, ADB_RunID= RunID, NotebookPath, ExecutionDuration, RunPageURL;
+ADF_Activity
+
+
