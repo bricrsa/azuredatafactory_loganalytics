@@ -1,0 +1,4 @@
+ADFActivityRun 
+| where Status == "Succeeded"
+| extend ouput = parse_json(Output)
+| extend SparkVersion = parse_json(Output).runStatus.sparkVersion
